@@ -1,0 +1,9 @@
+node_modules/
+database.sqlite3
+db
+<<<<<<< 3c5ad128d0cb209057488e7aca3e8582a19ab7c2
+client/components/Rebase.jsx
+TournamentManager-592bc37d77cb.json
+=======
+client/public/firebaseinitialize.js
+>>>>>>> still setting up firebase

@@ -2,27 +2,11 @@
 <head>
   <title>Game Manager</title>
   <script src="https://www.gstatic.com/firebasejs/3.5.2/firebase.js"></script>
-<<<<<<< 1e209c542d8694e4ebea3c9f96e8f8bcec13569a
+<<<<<<< 3c5ad128d0cb209057488e7aca3e8582a19ab7c2
   <script src="./../../firebaseinitialize.js"></script>
 =======
-  <script>
-    // Initialize Firebase with auth and database
-    var firebase = require("firebase/app");
-    require("firebase/auth");
-    require("firebase/database");
-    // Set the firebase configuration
-    var config = {
-      apiKey: "AIzaSyD0hce93DrHal98fEUKRMyPsnxtJlEywNU",
-      authDomain: "tournamentmanager-a5463.firebaseapp.com",
-      databaseURL: "https://tournamentmanager-a5463.firebaseio.com",
-      messagingSenderId: "530646916470"
-    };
-    firebase.initializeApp(config);
-
-    // Get a reference to the database service
-    var database = firebase.database();
-  </script>
->>>>>>> firebase set up in index.html
+  <script src="firebaseinitialize.js"></script>
+>>>>>>> still setting up firebase
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
