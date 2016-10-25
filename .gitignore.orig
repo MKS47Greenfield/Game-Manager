@@ -1,9 +1,0 @@
-node_modules/
-database.sqlite3
-db
-client/components/Rebase.jsx
-<<<<<<< bfc2eca3037ad87aa0ffaa08b15d2c2341bb216b
-firebaseinitialize.js
-=======
-client/public/firebaseinitialize.js
->>>>>>> still setting up firebase
