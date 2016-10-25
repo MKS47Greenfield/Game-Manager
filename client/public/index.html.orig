@@ -1,6 +1,29 @@
 <html>
 <head>
   <title>Game Manager</title>
+  <script src="https://www.gstatic.com/firebasejs/3.5.2/firebase.js"></script>
+<<<<<<< 1e209c542d8694e4ebea3c9f96e8f8bcec13569a
+  <script src="./../../firebaseinitialize.js"></script>
+=======
+  <script>
+    // Initialize Firebase with auth and database
+    var firebase = require("firebase/app");
+    require("firebase/auth");
+    require("firebase/database");
+    // Set the firebase configuration
+    var config = {
+      apiKey: "AIzaSyD0hce93DrHal98fEUKRMyPsnxtJlEywNU",
+      authDomain: "tournamentmanager-a5463.firebaseapp.com",
+      databaseURL: "https://tournamentmanager-a5463.firebaseio.com",
+      messagingSenderId: "530646916470"
+    };
+    firebase.initializeApp(config);
+
+    // Get a reference to the database service
+    var database = firebase.database();
+  </script>
+>>>>>>> firebase set up in index.html
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -12,28 +35,6 @@
 
   <div id="app"></div>
 
-  <script src="https://www.gstatic.com/firebasejs/3.5.2/firebase.js"></script>
-  <script>
-    // Initialize Firebase
-    var config = {
-      apiKey: "AIzaSyD0hce93DrHal98fEUKRMyPsnxtJlEywNU",
-      authDomain: "tournamentmanager-a5463.firebaseapp.com",
-      databaseURL: "https://tournamentmanager-a5463.firebaseio.com",
-      storageBucket: "",
-      messagingSenderId: "530646916470"
-    };
-<<<<<<< 37aaecf032e408d9e81518a585fd4e553aa15589
-    var firebase = require("firebase/app");
-    require("firebase/auth");
-    require("firebase/database");
-    firebase.initializeApp(config);
-  </script>
-
-=======
-    firebase.initializeApp(config);
-  </script>
-  
->>>>>>> switching to firebase, this is the last you will see of all the knex
   <script src="/app-bundle.js"></script>
 </body>
 </html>
