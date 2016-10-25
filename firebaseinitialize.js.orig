@@ -6,23 +6,24 @@ require("firebase/auth");
 require("firebase/database");
 // Set the firebase configuration
 var config = {
-<<<<<<< e7ec497ac7e7a65448f595b3319e0f32c70f2254
   serviceAccount: "TournamentManager-592bc37d77cb.json",
   databaseURL: "https://tournamentmanager-a5463.firebaseio.com"
-=======
-  apiKey: "AIzaSyD0hce93DrHal98fEUKRMyPsnxtJlEywNU",
-  authDomain: "tournamentmanager-a5463.firebaseapp.com",
-  databaseURL: "https://tournamentmanager-a5463.firebaseio.com",
-  messagingSenderId: "530646916470"
->>>>>>> main page loading, commencing server debugging
 };
 firebase.initializeApp(config);
 
 // Get a reference to the database service
-<<<<<<< e7ec497ac7e7a65448f595b3319e0f32c70f2254
 var db = firebase.database();
+<<<<<<< 0b18da36c2fb5ef3c075e10c426bafc40136a8df
 
 database.goOffline();//think I need these to end any existing dbs and start a new one?
+=======
+var ref = db.ref("restricted_access/secret_document");
+ref.once("value", function(snapshot) {
+  console.log(snapshot.val());
+});
+
+database.goOffline();
+>>>>>>> firebase service account set up and hooked in
 database.goOnline();
 
 var ref = db.ref("restricted_access/secret_document");
@@ -31,8 +32,3 @@ ref.once("value", function(snapshot) {
 });
 
 module.exports = ref;
-=======
-var database = firebase.database();
-database.goOffline();
-database.goOnline();
->>>>>>> main page loading, commencing server debugging

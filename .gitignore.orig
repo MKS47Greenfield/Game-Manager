@@ -1,9 +1,9 @@
 node_modules/
 database.sqlite3
 db
-<<<<<<< 3c5ad128d0cb209057488e7aca3e8582a19ab7c2
 client/components/Rebase.jsx
-TournamentManager-592bc37d77cb.json
-=======
+<<<<<<< 0b18da36c2fb5ef3c075e10c426bafc40136a8df
 client/public/firebaseinitialize.js
->>>>>>> still setting up firebase
+=======
+TournamentManager-592bc37d77cb.json
+>>>>>>> firebase service account set up and hooked in
