@@ -6,14 +6,17 @@ require("firebase/auth");
 require("firebase/database");
 // Set the firebase configuration
 var config = {
-  apiKey: "AIzaSyD0hce93DrHal98fEUKRMyPsnxtJlEywNU",
-  authDomain: "tournamentmanager-a5463.firebaseapp.com",
-  databaseURL: "https://tournamentmanager-a5463.firebaseio.com",
-  messagingSenderId: "530646916470"
+  serviceAccount: "TournamentManager-592bc37d77cb.json",
+  databaseURL: "https://tournamentmanager-a5463.firebaseio.com"
 };
 firebase.initializeApp(config);
 
 // Get a reference to the database service
-var database = firebase.database();
+var db = firebase.database();
+var ref = db.ref("restricted_access/secret_document");
+ref.once("value", function(snapshot) {
+  console.log(snapshot.val());
+});
+
 database.goOffline();
 database.goOnline();
