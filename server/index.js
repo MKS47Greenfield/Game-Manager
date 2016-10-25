@@ -21,9 +21,8 @@ routes.use( require('body-parser').json() );
 //
 routes.get('/app-bundle.js',
   browserify('./client/app.js', {
-    transform: [ [ require('babelify'), { presets: ['es2015', 'react'] } ] ]
-  })
-);
+    transform: [ require('reactify') ]
+  }));
 
 
 // Home page
@@ -102,11 +101,11 @@ routes.put('/api/tournaments', function(req, res) {
 
 //NOTE: REFACTOR, the below will only fetch ONGOING tournaments
 routes.get('/api/tournaments', function(req, res) {
-  knex('tournaments').where('winner_id', null)//TODO FIREBASE
-  .orderBy('id', 'desc')
-  .then(function(data) {
-    res.send(data);
-  });
+  // knex('tournaments').where('winner_id', null)//TODO FIREBASE
+  // .orderBy('id', 'desc')
+  // .then(function(data) {
+    // res.send(data);
+  // });
 });
 
 
@@ -137,20 +136,20 @@ routes.get('/api/games', function(req, res) {
   if (tourneyId) {
     console.log('tourney id in games get request:', tourneyId);
     // query the db here with the tourneyId
-    knex('games').where('tournament_id', tourneyId).then(function(response) {
-      //TODO FIREBASE
-      res.status(200).send(response);
-    }).catch(function(err) {
-      res.status(500).send(err);
-    });
+    // knex('games').where('tournament_id', tourneyId).then(function(response) {
+    //   //TODO FIREBASE
+    //   res.status(200).send(response);
+    // }).catch(function(err) {
+    //   res.status(500).send(err);
+    // });
   } else {
     // query the db here for all games
-    knex.select().from('games').then(function(response) {
-      //TODO FIREBASE
-      res.status(200).send(response);
-    }).catch(function(err) {
-      res.status(500).send(err);
-    });
+    // knex.select().from('games').then(function(response) {
+    //   //TODO FIREBASE
+    //   res.status(200).send(response);
+    // }).catch(function(err) {
+    //   res.status(500).send(err);
+    // });
   }
 });
 
