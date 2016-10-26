@@ -104,9 +104,11 @@ routes.put('/api/tournaments', function(req, res) {
 
 });
 
+//NOTE: should be handled on the front end now with FIREBASE
 //NOTE: REFACTOR, the below will only fetch ONGOING tournaments
 routes.get('/api/tournaments', function(req, res) {
-  // knex('tournaments').where('winner_id', null)//TODO FIREBASE
+
+  // knex('tournaments').where('winner_id', null)
   // .orderBy('id', 'desc')
   // .then(function(data) {
     // res.send(data);
@@ -129,7 +131,7 @@ routes.post('/api/games', function(req, res) {
     });
 });
 
-
+//NOTE: should be handled on the front end now with FIREBASE
   // If a tournament_id is passed in as a query, just send the games in that tournament
   // If not, we send ALL the games in the DB
 routes.get('/api/games', function(req, res) {
@@ -142,7 +144,6 @@ routes.get('/api/games', function(req, res) {
     console.log('tourney id in games get request:', tourneyId);
     // query the db here with the tourneyId
     // knex('games').where('tournament_id', tourneyId).then(function(response) {
-    //   //TODO FIREBASE
     //   res.status(200).send(response);
     // }).catch(function(err) {
     //   res.status(500).send(err);
@@ -150,7 +151,6 @@ routes.get('/api/games', function(req, res) {
   } else {
     // query the db here for all games
     // knex.select().from('games').then(function(response) {
-    //   //TODO FIREBASE
     //   res.status(200).send(response);
     // }).catch(function(err) {
     //   res.status(500).send(err);
