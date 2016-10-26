@@ -5,7 +5,12 @@ const express = require('express');
 const Path = require('path');
 const helpers = require('./serverHelpers.js');
 
-var routes = express.Router();
+const routes = express.Router();
+
+const db = require('firebaseinitialize.js');
+const usersRef = db.child('users');
+const tourneysRef = db.child('tournaments');
+const gamesRef = db.child('games');
 
 routes.use( require('body-parser').json() );
 
@@ -78,7 +83,7 @@ routes.post('/api/tournaments', function(req, res) {
     res.status(400).json({'message': 'YOU CAN\'T JUST PLAY ALONE!'});
   } else {
     // Otherwise make the call for the query!
-    helpers.makeTourney(tourneyName)
+    helpers.makeTourney(tourneyName)//refactor to send tourney ID
       .then(function(response) {
         res.status(201).send(response);
       }).catch(function(err) {
@@ -116,7 +121,7 @@ routes.get('/api/tournaments', function(req, res) {
 routes.post('/api/games', function(req, res) {
 
   helpers.createGamesForTourney(req)
-    .then(function(response) {
+    .then(function(response) {//now getting the path to the data
       res.status(201).send(response);
     })
     .catch(function(err) {

@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 // NOTE:
 // IF YOU HAVE COME IN HERE I AM SORRY,
 // FOR SERVERHELPERS IS DARK AND FULL OF TERRORS
@@ -9,6 +11,11 @@
 //     filename: './database.sqlite3'
 //   }
 // });
+
+const db = require('firebaseinitialize.js');
+const usersRef = db.child('users');
+const tourneysRef = db.child('tournaments');
+const gamesRef = db.child('games');
 
 exports.createGamesForTourney = function(req) {
   // games array will be returned by this function
@@ -49,14 +56,31 @@ exports.createGamesForTourney = function(req) {
   // Call it!!
   var games = makeGames(tourneyId, list);
   // return the promise from the query
-  //TODO FIREBASE
   // return knex('games').insert(games);
+
+  //FIREBASE
+  console.log(games);
+  tourneysRef.child(tourneyId).set({
+      'games': games,
+      'players': list
+  });
+
+  let gameCounter = 0;
+  let gameId;
+
+  return gamesRef.push(games, function (err) {
+    if (error) {
+      alert("Data could not be saved, because: " + error);
+    } else {
+      alert("Data saved successfully.");
+    }
+  });//returns the path to the new data (not a list of the objects)
 
 };
 
 exports.getTable = function(tourneyId) {
 
-  //TODO FIREBASE
+  //NOTE: since this all works on the front end with the listeners, we don't really need this
   // return knex('games').where('tournament_id', tourneyId)
   //   .then(function(games) {
   //     var standingsObj = games.filter(game =>
@@ -123,36 +147,38 @@ exports.getTable = function(tourneyId) {
   //   });
 };
 
-exports.setGameStatus = function(req, res) {
+// NOTE:this function doesn't appear to be called anywhere, so I'm commenting it out
+// exports.setGameStatus = function(req, res) {
+//
+//   // create the object to pass into the knex update
+//   var updateStatus = {};
+//
+//   // The 'current' key on the body will be a boolean. True means set to active, false means set back to created.
+//   req.body.current ? updateStatus.status = 'active' : updateStatus.status = 'created';
+//
+//   // Query the database for the correct game, and update it with the object we made above.
+//   // knex('games').where('id', req.body.game.id).update(updateStatus).then(function(response) {
+//   //   res.status(201);
+//   // }).catch(function(err) {
+//   //   res.status(500).send('err', err);
+//   //   throw err;
+//   // });
+// };
 
-  // create the object to pass into the knex update
-  var updateStatus = {};
-
-  // The 'current' key on the body will be a boolean. True means set to active, false means set back to created.
-  req.body.current ? updateStatus.status = 'active' : updateStatus.status = 'created';
-
-  // Query the database for the correct game, and update it with the object we made above.
-  // TODO:FIREBASE
-  // knex('games').where('id', req.body.game.id).update(updateStatus).then(function(response) {
-  //   res.status(201);
-  // }).catch(function(err) {
-  //   res.status(500).send('err', err);
-  //   throw err;
-  // });
-};
-
-exports.getAllPlayers = function(stringOfIds) {
-  if (stringOfIds) {
-    var arrayOfIds = stringOfIds.split('-');
-    //TODO: FIREBASE
-    // return knex('players').whereIn('id', arrayOfIds);
-  } else {
-    // return knex('players').select();
-  }
-};
+//NOTE:should be done with listeners on the front end
+// exports.getAllPlayers = function(stringOfIds) {
+//   if (stringOfIds) {
+//     var arrayOfIds = stringOfIds.split('-');
+//     // return knex('players').whereIn('id', arrayOfIds);
+//   } else {
+//     // return knex('players').select();
+//   }
+// };
 
 exports.setTournamentWinner = function(tourneyId, winnerId) {
-  //TODO: FIREBASE
+  return tourneysRef.child(tourneyId).set({
+    'winnerId': winnerId
+  });
   // return knex('tournaments')
   //   .where('id', tourneyId)
   //   .update('winner_id', winnerId);
@@ -170,7 +196,10 @@ exports.updateGames = (req) => {
     // the game is definitely not finished! Keep it created
   var status = player2Score === null ? 'created' : req.body.status;
 
-  // TODO: FIREBASE
+  return gamesRef.child(gameId).set({
+    'player1_score': player1Score,
+    'player2_score': player2Score
+  });
   // return knex('games').where('id', gameId)
   //   .update('player1_score', player1Score)
   //   .update('player2_score', player2Score)
@@ -178,14 +207,18 @@ exports.updateGames = (req) => {
 };
 
 exports.makePlayer = function(req) {
-  // TODO:FIREBASE
+  return usersRef.child(req.body.username).set({
+    'username': req.body.username
+  });
   // return knex('players').insert({
   //   username: req.body.username
   // });
 };
 
 exports.makeTourney = function(tourneyName) {
-  // TODO: FIREBASE
+  return tourneysRef.push().set({
+    'tournament_name': tourneyName
+  });
   // return knex('tournaments').insert({
   //   tournament_name: tourneyName
   // });
