@@ -16,12 +16,7 @@ firebase.initializeApp(config);
 // Get a reference to the database service
 var db = firebase.database();
 
-database.goOffline();//think I need these to end any existing dbs and start a new one?
-database.goOnline();
+db.goOffline();//think I need these to end any existing dbs and start a new one?
+db.goOnline();
 
-var ref = db.ref("restricted_access/secret_document");
-ref.once("value", function(snapshot) {
-  console.log(snapshot.val());
-});
-
-module.exports = ref;
+module.exports = db;
