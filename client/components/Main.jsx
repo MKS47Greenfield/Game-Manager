@@ -1,5 +1,3 @@
-/*jshint esversion: 6 */
-
 const React = require('react');
 const ReactDOM = require('react-dom');
 // const axios = require('axios'); //Used for AJAX calls
