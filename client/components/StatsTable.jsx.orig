@@ -5,6 +5,11 @@ var React = require('react');
 
 var StatsTable = (props) => {
 
+<<<<<<< 7a4570462b69131351ede318eab3b99c1c05feb2
+  var statLines = props.table.map(function(user, i) {
+    return <StatLine playerStats={user} key={i} />;
+  });
+=======
 //   getStats(sortBy) {
 //     return firebase.database().ref('/users').once('value')
 //       .then(snapshot) {
@@ -26,6 +31,7 @@ var StatsTable = (props) => {
     return <StatLine playerStats={x}/>
   })
 
+>>>>>>> stats table fix
 
 // need to make table column headers sort on click
   return (
