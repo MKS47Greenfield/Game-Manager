@@ -21,6 +21,8 @@ const FinishTournament = require('./FinishTournament.jsx');
 const OngoingTournamentsList = require('./OngoingTournamentsList.jsx');
 const StatsTable = require('./StatsTable.jsx');
 const utils = require('../fireUtils.js');
+const Login = require('./Login.jsx')
+
 
 class Main extends React.Component {
 
@@ -458,6 +460,7 @@ class Main extends React.Component {
             <ul className="nav navbar-nav">
               <li><a href="#"><span onClick={this.toggleStatsView.bind(this)} >Home</span></a></li>
               <li><a href="#"><span>Stats</span></a></li>
+
             </ul>
           </nav>
           <div className="container">
@@ -594,6 +597,10 @@ class Main extends React.Component {
             <ul className="nav navbar-nav">
               <li><a href="#"><span>Home</span></a></li>
               <li><a href="#"><span onClick={this.toggleStatsView.bind(this)}>Stats</span></a></li>
+              <li><Login /></li>
+              <li></li>
+              <li></li>
+              <li></li>
             </ul>
           </nav>
 
