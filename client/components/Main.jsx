@@ -95,7 +95,7 @@ class Main extends React.Component {
 
   }
 
-  addPlayer() {
+  addPlayer() {//NOTE:all handled by listeners in component willmount now
     // get some 'this' binding
     // var self = this;
     // // getAllPlayers needs access to the state for the list of tournament players, so it accepts that as an argument.
