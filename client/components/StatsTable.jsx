@@ -34,7 +34,11 @@ var StatsTable = (props) => {
   })
 
 
-// need to make table column headers sort on click
+  // handleClick() {
+  //   // return players objects sorted by column name property
+  // }
+
+
   return (
   <div className="panel panel-default">
     <div className="panel-heading">
@@ -45,11 +49,11 @@ var StatsTable = (props) => {
         <thead>
           <tr>
             <th>Player</th>
-            <th>GP</th>
-            <th>Won</th>
-            <th>Draw</th>
-            <th>Loss</th>
-            <th>GD</th>
+            <th>Games<br/>Played</th>
+            <th>Wins</th>
+            <th>Draws</th>
+            <th>Losses</th>
+            <th>Goal<br/>Differential</th>
             <th>Points</th>
           </tr>
         </thead>
