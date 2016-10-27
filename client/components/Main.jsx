@@ -125,12 +125,13 @@ class Main extends React.Component {
     var enough = true;
     // post request to the /api/tournaments endpoint with the tourneyName included
     if (this.state.tourneyPlayersList.length < 2) {
-      enough = false;
+      return;
     }
     return tourneysRef.push().set({
       tourneyName: tourneyName,
-      enough: enough
+      // enough: enough
     }).then(function(response) {
+      console.log(response)
       var tourneyId = response;
       context.createGames(context, tourneyId, context.state.tourneyPlayersList)
           .then(res => {
