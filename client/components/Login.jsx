@@ -1,5 +1,5 @@
 var React = require('react');
-var Button = require('react-native-button');
+// var Button = require('react-native-button');
 var firebase = require('firebase');
 require('firebase/auth');
 require('firebase/database');
@@ -77,28 +77,32 @@ class LoginForm extends React.Component {
     return (
       <div>
         <div className="google-btn">
-          <Button style={{ borderWidth: 1, borderColor: 'green'}}
-                  onPress={ this.googleLogin() }>
+          <button type="submit"
+                  style={{ borderWidth: 1, borderColor: 'green'}}
+                  onSubmit={ this.googleLogin() }>
           Sign in with Google
-          </Button>
+          </button>
         </div>
         <div className="facebook-btn">
-          <Button style={{ borderWidth: 1, borderColor: 'blue'}}
-                  onPress={ this.facebookLogin() }>
+          <button type="submit"
+                  style={{ borderWidth: 1, borderColor: 'blue'}}
+                  onSubmit={ this.facebookLogin() }>
           Sign in with Facebook
-          </Button>
+          </button>
         </div>
         <div className="twitter-btn">
-          <Button style={{ borderWidth: 1, borderColor: 'lightblue'}}
-                  onPress={ this.twitterLogin() }>
+          <button type="submit"
+                  style={{ borderWidth: 1, borderColor: 'lightblue'}}
+                  onSubmit={ this.twitterLogin() }>
           Sign in with Twitter
-          </Button>
+          </button>
         </div>
         <div className="logout">
-          <Button style={{ borderWidth: 1, borderColor: 'red'}}
-                  onPress={ this.signOut() }>
+          <button type="submit"
+                  style={{ borderWidth: 1, borderColor: 'red'}}
+                  onSubmit={ this.signOut() }>
           Sign out
-          </Button>
+          </button>
         </div>
       </div>
     )
