@@ -10,10 +10,7 @@ let usersRef;
 let playersRef;
 let tourneysRef;
 let gamesRef;
-<<<<<<< 53d61247a26e5a2dd38811031059263c20d06065
 let currentPlayersList;
-=======
->>>>>>> dual database set up for players working
 
 // const rebase = require('./Rebase.jsx');//used to hook up firebase and react
 
@@ -70,38 +67,22 @@ class Main extends React.Component {
   componentWillMount() {//for more info on this set up see
     //https://firebase.googleblog.com/2014/05/using-firebase-with-reactjs.html
     console.log(this.state.pongView);
-<<<<<<< 53d61247a26e5a2dd38811031059263c20d06065
     const self = this;
     if(!this.state.pongView){
-=======
-    if(!this.state.pongView){
       console.log('hi');
->>>>>>> dual database set up for players working
       usersRef = 'fifa/users/';
       playersRef = 'fifa/players/';
       tourneysRef = 'fifa/tournaments/';
       gamesRef = 'fifa/games/';
-<<<<<<< 53d61247a26e5a2dd38811031059263c20d06065
       currentPlayersList = 'allFifaPlayersList';
 
-=======
->>>>>>> dual database set up for players working
       console.log(usersRef);
     } else {
       usersRef = 'pong/users/';
       playersRef = 'pong/players/';
       tourneysRef = 'pong/tournaments/';
       gamesRef = 'pong/games/';
-<<<<<<< 53d61247a26e5a2dd38811031059263c20d06065
       currentPlayersList = 'allPongPlayersList';
-    }
-    var players = [];
-    var currPlayers;
-    db.ref(usersRef).on('child_added', function(snapshot) {
-      players.push(snapshot.val());
-      currPlayers = players.filter(function (player) {//filters for those in a tournament
-        if (self.state.tourneyPlayersList.includes(player)) {
-=======
     }
     console.log(usersRef);
     var players = [];
@@ -130,7 +111,6 @@ class Main extends React.Component {
       });
       players.filter(function (player) {//filters for those in a tournament
         if (this.state.tourneyPlayersList.includes(player)) {
->>>>>>> dual database set up for players working
           return false;
         }
         return true;
@@ -207,12 +187,8 @@ class Main extends React.Component {
     var context = this;
     // post request to the /api/tournaments endpoint with the tourneyName included
     if (this.state.tourneyPlayersList.length < 2) {
-<<<<<<< 53d61247a26e5a2dd38811031059263c20d06065
       console.log('not enough players in tournament');
       return;
-=======
-      throw new Error('You need at least two players');
->>>>>>> dual database set up for players working
     }
 
     console.log('MAIN cT tourneyName: ', tourneyName);
@@ -225,8 +201,8 @@ class Main extends React.Component {
         console.log('error: ', err);
       }
     });
-    return this.createGames(newTourneyRef, tourneyName, this.state.tourneyPlayersList);
-    //returns path to new games
+
+    this.createGames(newTourneyRef, this.state.tourneyPlayersList);
 
     // .then(function(response) {
     //   console.log('MAIN cT res: ', response)
