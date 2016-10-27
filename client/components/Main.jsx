@@ -72,7 +72,6 @@ class Main extends React.Component {
         }
         return true;
       }.bind(this));
-      console.log(players);
       this.setState({
         // Adds the players from the db not already in a tourney to allPlayersList
         allPlayersList: players
@@ -86,9 +85,7 @@ class Main extends React.Component {
         tourneyId: snapshot.key,
         data: snapshot.val()
       });
-      console.log(ongoingTournamentsList);
       this.setState({
-        // Adds the players from the db not already in a tourney to allPlayersList
         ongoingTournamentsList: ongoingTournamentsList
       });
     }.bind(this));
