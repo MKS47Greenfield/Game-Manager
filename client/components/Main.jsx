@@ -179,7 +179,6 @@ class Main extends React.Component {
         console.log('error: ', err);
       }
     });
-
     this.createGames(newTourneyRef, this.state.tourneyPlayersList);
 
     // .then(function(response) {
