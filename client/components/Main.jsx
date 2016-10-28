@@ -69,7 +69,7 @@ class Main extends React.Component {
     console.log(this.state.pongView);
     const self = this;
     if(!this.state.pongView){
-      usersRef = 'fifa/users/';
+      usersRef = 'users/';
       playersRef = 'fifa/players/';
       tourneysRef = 'fifa/tournaments/';
       gamesRef = 'fifa/games/';
@@ -77,50 +77,18 @@ class Main extends React.Component {
 
       console.log(usersRef);
     } else {
-      usersRef = 'pong/users/';
+      usersRef = 'users/';
       playersRef = 'pong/players/';
       tourneysRef = 'pong/tournaments/';
       gamesRef = 'pong/games/';
       currentPlayersList = 'allPongPlayersList';
     }
-    var players = [];
-    var currPlayers;
-    db.ref(usersRef).on('child_added', function(snapshot) {
-      players.push(snapshot.val());
-      currPlayers = players.filter(function (player) {//filters for those in a tournament
-        if (self.state.tourneyPlayersList.includes(player)) {
-          return false;
-        }
-        return true;
-      });
-      self.setState({
-        // Adds the players from the db not already in a tourney to allPlayersList
-        allPlayersList: currPlayers
-      });
+    db.ref('users/').on('child_added', function(snapshot) {
+      self.state[currentPlayersList].push(snapshot.val());
     });
 
     db.ref(playersRef).on('child_added', function(snapshot) {
-      players.push(snapshot.val());
-      currPlayers = players.filter(function (player) {//filters for those in a tournament
-        if (self.state.tourneyPlayersList.includes(player)) {
-          return false;
-        }
-        return true;
-      });
-      console.log(currPlayers);
-      if (currentPlayersList === 'allFifaPlayersList') {
-
-        self.setState({
-          // Adds the players from the db not already in a tourney to allPlayersList
-          allFifaPlayersList: currPlayers
-        });
-      } else if (currentPlayersList === 'allPongPlayersList') {
-        self.setState({
-          // Adds the players from the db not already in a tourney to allPlayersList
-          allPongPlayersList: currPlayers
-        });
-
-      }
+      self.state[currentPlayersList].push(snapshot.val());
     });
 
     var ongoingTournamentsList = [];
