@@ -10,6 +10,7 @@ let usersRef;
 let playersRef;
 let tourneysRef;
 let gamesRef;
+let currentPlayersList;
 
 // const rebase = require('./Rebase.jsx');//used to hook up firebase and react
 
@@ -38,6 +39,8 @@ class Main extends React.Component {
       // allPlayersList holds all existing players as objects.
         // These objects have id and username keys/values.
       allPlayersList: [],
+      allFifaPlayersList: [],
+      allPongPlayersList: [],
       // tourneyPlayersList holds all players in the current/to be created tournament
         // Same player objects as the allPlayersList
       tourneyPlayersList: [],
@@ -64,56 +67,61 @@ class Main extends React.Component {
   componentWillMount() {//for more info on this set up see
     //https://firebase.googleblog.com/2014/05/using-firebase-with-reactjs.html
     console.log(this.state.pongView);
+    const self = this;
     if(!this.state.pongView){
-      console.log('hi');
       usersRef = 'fifa/users/';
       playersRef = 'fifa/players/';
       tourneysRef = 'fifa/tournaments/';
       gamesRef = 'fifa/games/';
+      currentPlayersList = 'allFifaPlayersList';
+
       console.log(usersRef);
     } else {
       usersRef = 'pong/users/';
       playersRef = 'pong/players/';
       tourneysRef = 'pong/tournaments/';
       gamesRef = 'pong/games/';
+      currentPlayersList = 'allPongPlayersList';
     }
-    console.log(usersRef);
     var players = [];
+    var currPlayers;
     db.ref(usersRef).on('child_added', function(snapshot) {
-      players.push({
-        uid: snapshot.key,
-        data: snapshot.val()
-      });
-      players.filter(function (player) {//filters for those in a tournament
-        if (this.state.tourneyPlayersList.includes(player)) {
+      players.push(snapshot.val());
+      currPlayers = players.filter(function (player) {//filters for those in a tournament
+        if (self.state.tourneyPlayersList.includes(player)) {
           return false;
         }
         return true;
-      }.bind(this));
-      this.setState({
-        // Adds the players from the db not already in a tourney to allPlayersList
-        allPlayersList: players
       });
-
-    }.bind(this));
+      self.setState({
+        // Adds the players from the db not already in a tourney to allPlayersList
+        allPlayersList: currPlayers
+      });
+    });
 
     db.ref(playersRef).on('child_added', function(snapshot) {
-      players.push({
-        username: snapshot.key,
-        data: snapshot.val()
-      });
-      players.filter(function (player) {//filters for those in a tournament
-        if (this.state.tourneyPlayersList.includes(player)) {
+      players.push(snapshot.val());
+      currPlayers = players.filter(function (player) {//filters for those in a tournament
+        if (self.state.tourneyPlayersList.includes(player)) {
           return false;
         }
         return true;
-      }.bind(this));
-      this.setState({
-        // Adds the players from the db not already in a tourney to allPlayersList
-        allPlayersList: players
       });
+      console.log(currPlayers);
+      if (currentPlayersList === 'allFifaPlayersList') {
 
-    }.bind(this));
+        self.setState({
+          // Adds the players from the db not already in a tourney to allPlayersList
+          allFifaPlayersList: currPlayers
+        });
+      } else if (currentPlayersList === 'allPongPlayersList') {
+        self.setState({
+          // Adds the players from the db not already in a tourney to allPlayersList
+          allPongPlayersList: currPlayers
+        });
+
+      }
+    });
 
     var ongoingTournamentsList = [];
     db.ref(tourneysRef).on('child_added', function(snapshot) {
@@ -317,29 +325,55 @@ class Main extends React.Component {
   // this function moves a Player component to the list they are not in
     // tourneyPlayersList into allPlayersList, and visa versa.
   movePlayer(playerComponent, index) {
+if (!this.state.pongView) {
+  // check if the tourneyPlayersList has this Player
+  if (this.state.tourneyPlayersList.includes(playerComponent)) {
 
-    // check if the tourneyPlayersList has this Player
-    if (this.state.tourneyPlayersList.includes(playerComponent)) {
+    // if so, we move from that list with a splice.
+    var out = this.state.tourneyPlayersList.splice(index, 1)[0];
 
-      // if so, we move from that list with a splice.
-      var out = this.state.tourneyPlayersList.splice(index, 1)[0];
+    // then push the first index of that spliced out array into the allPlayersList
+    this.state.allFifaPlayersList.push(out);
 
-      // then push the first index of that spliced out array into the allPlayersList
-      this.state.allPlayersList.push(out);
+    // force update should update the state now, as we are not setting state
+    // inside a this.setState function
+    this.forceUpdate();
 
-      // force update should update the state now, as we are not setting state
-        // inside a this.setState function
-      this.forceUpdate();
+  } else {
+    // otherwise, we remove it from the players list and add to the touney list
+    var out = this.state.allFifaPlayersList.splice(index, 1)[0];
 
-    } else {
-      // otherwise, we remove it from the players list and add to the touney list
-      var out = this.state.allPlayersList.splice(index, 1)[0];
+    // same thing as above, just removing from allPlayersList and adding to the
+    //  tourneylist
+    this.state.tourneyPlayersList.push(out);
+    this.forceUpdate();
+  }
 
-      // same thing as above, just removing from allPlayersList and adding to the
-        //  tourneylist
-      this.state.tourneyPlayersList.push(out);
-      this.forceUpdate();
-    }
+} else {
+  // check if the tourneyPlayersList has this Player
+  if (this.state.tourneyPlayersList.includes(playerComponent)) {
+
+    // if so, we move from that list with a splice.
+    var out = this.state.tourneyPlayersList.splice(index, 1)[0];
+
+    // then push the first index of that spliced out array into the allPlayersList
+    this.state.allPongPlayersList.push(out);
+
+    // force update should update the state now, as we are not setting state
+    // inside a this.setState function
+    this.forceUpdate();
+
+  } else {
+    // otherwise, we remove it from the players list and add to the touney list
+    var out = this.state.allPongPlayersList.splice(index, 1)[0];
+
+    // same thing as above, just removing from allPlayersList and adding to the
+    //  tourneylist
+    this.state.tourneyPlayersList.push(out);
+    this.forceUpdate();
+  }
+
+}
   }
 
   // setCurrentGame takes in the game 'to be active', and the currently active game.
@@ -577,7 +611,7 @@ class Main extends React.Component {
 
             <div className="col-xs-5">
               {/* this will render out with the existing players in the database, and ones added through the form */}
-              <AllPlayersList players={this.state.allPlayersList} click={this.movePlayer.bind(this)}/>
+              <AllPlayersList players={this.state[currentPlayersList]} click={this.movePlayer.bind(this)}/>
             </div>
 
             <div className="col-xs-1">
@@ -799,7 +833,7 @@ class Main extends React.Component {
 
             <div className="col-xs-5">
               {/* this will render out with the existing players in the database, and ones added through the form */}
-              <AllPlayersList players={this.state.allPlayersList} click={this.movePlayer.bind(this)}/>
+              <AllPlayersList players={this.state[currentPlayersList]} click={this.movePlayer.bind(this)}/>
             </div>
 
             <div className="col-xs-1">

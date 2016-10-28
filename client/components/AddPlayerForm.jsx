@@ -33,8 +33,10 @@ class Form extends React.Component {
     } else {
       playersRef = db.ref('pong/players/');
     }
-    var userPath = playersRef.child(this.state.value).set({
-      username: this.state.value
+    var userPath = playersRef.push();
+    userPath.set({
+      username: this.state.value,
+      id: userPath.key
     }).then(function(res) {
       self.setState({
         value: '',
