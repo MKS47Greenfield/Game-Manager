@@ -748,7 +748,7 @@ if (!this.state.pongView) {
             </div>
 
             <div className="col-xs-10">
-              <StatsTable table={this.state.allPlayersList} />
+              <StatsTable table={this.state.allFifaPlayersList} />
             </div>
 
             <div className="col-xs-1">
