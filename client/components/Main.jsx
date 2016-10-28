@@ -69,7 +69,6 @@ class Main extends React.Component {
     console.log(this.state.pongView);
     const self = this;
     if(!this.state.pongView){
-      console.log('hi');
       usersRef = 'fifa/users/';
       playersRef = 'fifa/players/';
       tourneysRef = 'fifa/tournaments/';
@@ -84,38 +83,17 @@ class Main extends React.Component {
       gamesRef = 'pong/games/';
       currentPlayersList = 'allPongPlayersList';
     }
-    console.log(usersRef);
     var players = [];
+    var currPlayers;
     db.ref(usersRef).on('child_added', function(snapshot) {
-      players.push({
-        uid: snapshot.key,
-        data: snapshot.val()
-      });
-      players.filter(function (player) {//filters for those in a tournament
-        if (this.state.tourneyPlayersList.includes(player)) {
+      players.push(snapshot.val());
+      currPlayers = players.filter(function (player) {//filters for those in a tournament
+        if (self.state.tourneyPlayersList.includes(player)) {
           return false;
         }
         return true;
-      }.bind(this));
-      this.setState({
-        // Adds the players from the db not already in a tourney to allPlayersList
-        allPlayersList: players
       });
-
-    }.bind(this));
-
-    db.ref(playersRef).on('child_added', function(snapshot) {
-      players.push({
-        username: snapshot.key,
-        data: snapshot.val()
-      });
-      players.filter(function (player) {//filters for those in a tournament
-        if (this.state.tourneyPlayersList.includes(player)) {
-          return false;
-        }
-        return true;
-      }.bind(this));
-      this.setState({
+      self.setState({
         // Adds the players from the db not already in a tourney to allPlayersList
         allPlayersList: currPlayers
       });
