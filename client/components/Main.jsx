@@ -11,6 +11,7 @@ let playersRef;
 let tourneysRef;
 let gamesRef;
 let currentPlayersList;
+let currentTourneyList;
 
 // const rebase = require('./Rebase.jsx');//used to hook up firebase and react
 
@@ -55,6 +56,8 @@ class Main extends React.Component {
       currentTournament: null,
       // This one here isn't to hard to guess either!
       ongoingTournamentsList: [],
+      ongoingFifaTournamentsList: [],
+      ongoingPongTournamentsList: [],
 
       statsView: false,
 
@@ -69,39 +72,62 @@ class Main extends React.Component {
     console.log(this.state.pongView);
     const self = this;
     if(!this.state.pongView){
-      usersRef = 'users/';
-      playersRef = 'fifa/players/';
-      tourneysRef = 'fifa/tournaments/';
-      gamesRef = 'fifa/games/';
+    //   usersRef = 'users/';
+    //   playersRef = 'fifa/players/';
+    //   tourneysRef = 'fifa/tournaments/';
+    //   gamesRef = 'fifa/games/';
       currentPlayersList = 'allFifaPlayersList';
-
-      console.log(usersRef);
+      currentTourneyList = 'ongoingFifaTournamentsList';
+    //
+    //   console.log(usersRef);
     } else {
-      usersRef = 'users/';
-      playersRef = 'pong/players/';
-      tourneysRef = 'pong/tournaments/';
-      gamesRef = 'pong/games/';
+    //   usersRef = 'users/';
+    //   playersRef = 'pong/players/';
+    //   tourneysRef = 'pong/tournaments/';
+    //   gamesRef = 'pong/games/';
       currentPlayersList = 'allPongPlayersList';
+      currentTourneyList = 'ongoingPongTournamentsList';
     }
     db.ref('users/').on('child_added', function(snapshot) {
-      self.state[currentPlayersList].push(snapshot.val());
+      self.state.allPlayersList.push(snapshot.val());
+      self.state.allFifaPlayersList.push(snapshot.val());
+      self.state.allPongPlayersList.push(snapshot.val());
       self.forceUpdate();
     });
 
-    db.ref(playersRef).on('child_added', function(snapshot) {
-      self.state[currentPlayersList].push(snapshot.val());
+    db.ref('fifa/players/').on('child_added', function(snapshot) {
+      self.state.allFifaPlayersList.push(snapshot.val());
+      self.state.allPlayersList.push(snapshot.val());
+      self.forceUpdate();
+    });
+    db.ref('pong/players/').on('child_added', function(snapshot) {
+      self.state.allPongPlayersList.push(snapshot.val());
+      self.state.allPlayersList.push(snapshot.val());
       self.forceUpdate();
     });
 
-    var ongoingTournamentsList = [];
-    db.ref(tourneysRef).on('child_added', function(snapshot) {
-      ongoingTournamentsList.push({
+    var ongoingFifaTournamentsList = [];
+    var ongoingPongTournamentsList = [];
+    db.ref('fifa/tournaments/').on('child_added', function(snapshot) {
+      ongoingFifaTournamentsList.push({
         tourneyId: snapshot.key,
         data: snapshot.val()
       });
       this.setState({
-        ongoingTournamentsList: ongoingTournamentsList
+        ongoingFifaTournamentsList: ongoingFifaTournamentsList
       });
+      this.state.ongoingTournamentsList.push(ongoingFifaTournamentsList);
+    }.bind(this));
+
+    db.ref('pong/tournaments/').on('child_added', function(snapshot) {
+      ongoingPongTournamentsList.push({
+        tourneyId: snapshot.key,
+        data: snapshot.val()
+      });
+      this.setState({
+        ongoingPongTournamentsList: ongoingPongTournamentsList
+      });
+      this.state.ongoingTournamentsList.push(ongoingPongTournamentsList);
     }.bind(this));
   }
 
@@ -324,7 +350,7 @@ if (!this.state.pongView) {
       // We do this by passing the index of the clicked on item up to this function,
       // then using that index to find the correct tournament in the ongoingTournamentsList.
     this.setState({
-      currentTournament: this.state.ongoingTournamentsList[index]
+      currentTournament: this.state[currentTourneyList][index]
     });
     // When we have a currentTournament, update the games and players.
     this.updateGames(tourneyId, this.updatePlayers);
@@ -354,9 +380,14 @@ if (!this.state.pongView) {
   toggleBoth() {
     var self = this;
     this.setState({
-      statsView: !this.state.statsView,
-      pongView: !this.state.pongView
-    })
+      pongView: !this.state.pongView,
+      statsView: !this.state.statsView
+    });
+    // React.unmountComponentAtNode(document.getElementById('app'));
+    // React.renderComponent(
+    //   <Main pongView=(!this.props.pongView)/>, // JSX
+    //   document.getElementById('app')
+    // );
   }
 
   togglePongView() {
@@ -364,8 +395,10 @@ if (!this.state.pongView) {
     var self = this;
     if (currentPlayersList === 'allFifaPlayersList') {
       currentPlayersList = 'allPongPlayersList';
+      currentTourneyList = 'ongoingFifaTournamentsList';
     } else {
       currentPlayersList = 'allFifaPlayersList';
+      currentTourneyList = 'ongoingPongTournamentsList';
     }
     this.setState({
       pongView: !this.state.pongView,
@@ -540,7 +573,7 @@ if (!this.state.pongView) {
                   <NewTournamentPlayers players={this.state.tourneyPlayersList} click={this.movePlayer.bind(this)} />
                 </div>
               </div>
-              <OngoingTournamentsList tourneys={this.state.ongoingTournamentsList} click={this.setCurrentTournament.bind(this)}/>
+              <OngoingTournamentsList tourneys={this.state[currentTourneyList]} click={this.setCurrentTournament.bind(this)}/>
             </div>
 
             <div className="col-xs-5">
@@ -740,7 +773,7 @@ if (!this.state.pongView) {
             <div className="col-xs-1"></div>
             <div className="col-xs-4">
                 <h3>ADD PLAYER</h3>
-                <AddPlayerForm addPlayer={this.addPlayer.bind(this)} />
+                <AddPlayerForm parentState={this.state} addPlayer={this.addPlayer.bind(this)} />
             </div>
             <div className="col-xs-7"></div>
           </div>
@@ -762,7 +795,7 @@ if (!this.state.pongView) {
                   <NewTournamentPlayers players={this.state.tourneyPlayersList} click={this.movePlayer.bind(this)} />
                 </div>
               </div>
-              <OngoingTournamentsList tourneys={this.state.ongoingTournamentsList} click={this.setCurrentTournament.bind(this)}/>
+              <OngoingTournamentsList tourneys={this.state[currentTourneyList]} click={this.setCurrentTournament.bind(this)}/>
             </div>
 
             <div className="col-xs-5">

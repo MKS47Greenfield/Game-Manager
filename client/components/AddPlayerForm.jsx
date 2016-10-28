@@ -27,7 +27,7 @@ class Form extends React.Component {
   addNewPlayer(event) {
     var self = this;
     event.preventDefault();
-    console.log('pongview?:', this.props.parentState.pongView);
+    console.log('add player form props?:', this.props);
     var userPath;
     if(!this.props.parentState.pongView){
       userPath = db.ref('fifa/players/').push();
@@ -43,6 +43,9 @@ class Form extends React.Component {
         id: userPath.key
       });
     }
+    this.setState({
+      value: ''
+    });
 
     // axios.post('/api/player', {
     //   username: this.state.value
