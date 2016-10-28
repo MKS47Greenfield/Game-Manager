@@ -179,7 +179,8 @@ class Main extends React.Component {
         console.log('error: ', err);
       }
     });
-    this.createGames(newTourneyRef, this.state.tourneyPlayersList);
+    return this.createGames(newTourneyRef, tourneyName, this.state.tourneyPlayersList);
+    //returns path to new games
 
     // .then(function(response) {
     //   console.log('MAIN cT res: ', response)
