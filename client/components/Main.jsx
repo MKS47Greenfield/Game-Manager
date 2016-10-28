@@ -170,7 +170,7 @@ class Main extends React.Component {
     }
 
     console.log('MAIN cT tourneyName: ', tourneyName);
-    var newTourneyRef = tourneysRef.push();
+    var newTourneyRef = db.ref(tourneysRef).push();
 
     newTourneyRef.set({
       tourneyName: tourneyName,
@@ -179,7 +179,6 @@ class Main extends React.Component {
         console.log('error: ', err);
       }
     });
-
     this.createGames(newTourneyRef, this.state.tourneyPlayersList);
 
 
@@ -216,16 +215,16 @@ class Main extends React.Component {
     //   throw err;
     // });
 
-    return tourneysRef.push().set({
-      tourneyName: tourneyName
-    }).then(function(response) {
-      var tourneyId = 5;
-      context.createGames(context, tourneyId, context.state.tourneyPlayersList)
-          .then(res => {
-            context.setState({
-              // currentTournamentTable: res,
-              currentTournament: { id: tourneyId, tournament_name: tourneyName }
-            });
+    // return db.ref(tourneysRef).push().set({
+    //   tourneyName: tourneyName
+    // }).then(function(response) {
+    //   var tourneyId = 5;
+    //   context.createGames(context, tourneyId, context.state.tourneyPlayersList)
+    //       .then(res => {
+    //         context.setState({
+    //           // currentTournamentTable: res,
+    //           currentTournament: { id: tourneyId, tournament_name: tourneyName }
+    //         });
             //TODO: figure out if this is working now NOTE NOTE
             // NOTE: This function call is failing because when we create a new tournament,
               // getTableForTourney gets all the game for that tournament, then filters down to only the games played.
@@ -241,14 +240,14 @@ class Main extends React.Component {
             // .catch(err => {
             //   throw err;
             // });
-          }).catch(err => {
-            throw err;
-          });
-        // then call createGames with the new tourney ID
-    }).catch(function(err) {
-        // handles some errors
-      throw err;
-    });
+    //       }).catch(err => {
+    //         throw err;
+    //       });
+    //     // then call createGames with the new tourney ID
+    // }).catch(function(err) {
+    //     // handles some errors
+    //   throw err;
+    // });
   }
 
 
@@ -296,10 +295,10 @@ class Main extends React.Component {
   // createGames will be called when the button linked to createTournament is clicked.
   createGames(newTourneyRef, list) {
     var self = this;
-    console.log('tourneyId:', newTourneyRef);
+    console.log('tourneyId:', newTourneyRef.key);
     // Post request to the /api/games endpoint with the the tourneyPlayerList.
 
-    db.ref(tourneysRef).child(tourneyId).child('players').push(list);
+    db.ref(tourneysRef).child(newTourneyRef.key).child('players').set(list);
 
 
     return utils.postGames(newTourneyRef, list)
@@ -434,9 +433,16 @@ if (!this.state.pongView) {
   }
 
   togglePongView() {
+    console.log('figure out why pong state doesnt transfer to add player form as props');
     var self = this;
+    if (currentPlayersList === 'allFifaPlayersList') {
+      currentPlayersList = 'allPongPlayersList';
+    } else {
+      currentPlayersList = 'allFifaPlayersList';
+    }
     this.setState({
-      pongView: !this.state.pongView
+      pongView: !this.state.pongView,
+      tourneyPlayersList: []
     });
   }
 
@@ -584,7 +590,7 @@ if (!this.state.pongView) {
             <div className="col-xs-1"></div>
             <div className="col-xs-4">
                 <h3>ADD PLAYER</h3>
-                <AddPlayerForm addPlayer={this.addPlayer.bind(this)} />
+                <AddPlayerForm pongView={this.state.pongView} addPlayer={this.addPlayer.bind(this)} />
             </div>
             <div className="col-xs-7"></div>
           </div>
