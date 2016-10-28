@@ -11,8 +11,7 @@ class Form extends React.Component {
 
     this.state = {
       value: '',
-      noError: true,
-      playersRef: 'fifa/players/'
+      noError: true
     };
   }
 
@@ -28,21 +27,22 @@ class Form extends React.Component {
   addNewPlayer(event) {
     var self = this;
     event.preventDefault();
-    console.log('pongview?:', this.props.pongView);
-    if(!this.props.pongView){
-      this.setState({
-        playersRef:'fifa/players/'
+    console.log('pongview?:', this.props.parentState.pongView);
+    var userPath;
+    if(!this.props.parentState.pongView){
+      userPath = db.ref('fifa/players/').push();
+      userPath.set({
+        username: this.state.value,
+        id: userPath.key
       });
     } else {
-      this.setState({
-        playersRef:'pong/players/'
+      console.log('setting to pong players');
+      userPath = db.ref('pong/players/').push();
+      userPath.set({
+        username: this.state.value,
+        id: userPath.key
       });
     }
-    var userPath = db.ref(this.state.playersRef).push();
-    userPath.set({
-      username: this.state.value,
-      id: userPath.key
-    });
 
     // axios.post('/api/player', {
     //   username: this.state.value

@@ -3,7 +3,7 @@ var Game = require('./Game.jsx');
 var GameStatsForm = require('./GameStatsForm.jsx');
 
 var CurrentTournament = (props) => {
-
+  console.log('props:', props);
   var playersInTourney = {}; //Create an object that will assign IDs to names, in order to then pass that down to game components
 
   props.tourney.tourneyPlayersList.forEach(function(player) {
@@ -21,7 +21,7 @@ var CurrentTournament = (props) => {
     <div>
       <div className="panel panel-default">
         <div className="panel-heading">
-          <h3>{props.tourney.currentTournament.tournament_name.toUpperCase()}</h3>
+          <h3>{props.tourney.currentTournament.data.tourneyName.toUpperCase()}</h3>
         </div>
         <div className="panel-body">
           <GameStatsForm currentGame={props.tourney.currentGame} updateGames={props.updateGames} />
