@@ -179,8 +179,8 @@ class Main extends React.Component {
         console.log('error: ', err);
       }
     });
-    this.createGames(newTourneyRef, this.state.tourneyPlayersList);
-
+    return this.createGames(newTourneyRef, tourneyName, this.state.tourneyPlayersList);
+    //returns path to new games
 
     // .then(function(response) {
     //   console.log('MAIN cT res: ', response)
@@ -293,32 +293,90 @@ class Main extends React.Component {
   // }
 
   // createGames will be called when the button linked to createTournament is clicked.
-  createGames(newTourneyRef, list) {
+  createGames(newTourneyRef, tourneyName, list) {
     var self = this;
-    console.log('tourneyId:', newTourneyRef.key);
+    var tourneyId = newTourneyRef.key;
+    console.log('tourneyId:', tourneyId);
     // Post request to the /api/games endpoint with the the tourneyPlayerList.
 
-    db.ref(tourneysRef).child(newTourneyRef.key).child('players').set(list);
+    //taken from server helpers to create games
+    // games array will be returned by this function
 
 
-    return utils.postGames(newTourneyRef, list)
-      .then(function(response) {
-        // getGamesByTourneyId returns a promise object that resolves with two keys; games, and nextGame
-        utils.getGamesByTourneyId(newTourneyRef).then(function(res) {
-          self.setState({
-            // We take those and set them to their appropriate state keys.
-            currentTournamentGames: res.games,
-            currentGame: res.nextGame
-          });
-        })
-        .catch(function(err) {
-          // This error handles failures in the getting of games back.
-          console.log('Error in get games by tourneyID:', err);
+    // This inner function is used to makeGames.
+    function makeGames(tourneyId, list) {
+      var games = [];
+
+      // while there is more than one player in the tourneyPlayersList,
+      while (list.length > 1) {
+
+        // shift the first item off and hold it with our nextPlayer variable,
+        var nextPlayer = list.shift();
+
+        // then forEach player left in there, create a game with the nextPlayer
+        // and push that game into the games array.
+        list.forEach(function(playerObj) {
+
+          // This will be the object pushed into the games array.
+          var gameObj = {};
+
+          // set the needed values for the game object
+          gameObj.player1_id = nextPlayer.id;
+          gameObj.player1_name = nextPlayer.username;
+          gameObj.player2_id = playerObj.id;
+          gameObj.player2_name = playerObj.username;
+          gameObj.tournament_id = tourneyId;
+          gameObj.tournament_name = tourneyName;
+
+          // push into the games array
+          games.push(gameObj);
         });
-      }).catch(function(err) {
-        // This error handles failures posting games to the server/database.
-        console.log(err, 'failed to post to games');
-      });
+      }
+      return games;
+    }
+    // Call it!!
+    var games = makeGames(tourneyId, list);
+    // return the promise from the query
+    // return knex('games').insert(games);
+
+    //FIREBASE
+    console.log(games);
+    db.ref(tourneysRef).child(tourneyId).set({
+        'games': games,
+        'players': list,
+        'name': tourneyName
+    });
+
+    let gameCounter = 0;
+    let gameId;
+
+    return db.ref(gamesRef).push(games, function (error) {
+      if (error) {
+        console.log("Data could not be saved, because: " + error);
+      } else {
+        console.log("Data saved successfully.");
+      }
+    });//returns the path to the new data (not a list of the objects)
+
+
+    // return utils.postGames(newTourneyRef, list)
+    //   .then(function(response) {
+    //     // getGamesByTourneyId returns a promise object that resolves with two keys; games, and nextGame
+    //     utils.getGamesByTourneyId(newTourneyRef).then(function(res) {
+    //       self.setState({
+    //         // We take those and set them to their appropriate state keys.
+    //         currentTournamentGames: res.games,
+    //         currentGame: res.nextGame
+    //       });
+    //     })
+    //     .catch(function(err) {
+    //       // This error handles failures in the getting of games back.
+    //       console.log('Error in get games by tourneyID:', err);
+    //     });
+    //   }).catch(function(err) {
+    //     // This error handles failures posting games to the server/database.
+    //     console.log(err, 'failed to post to games');
+    //   });
   }
 
   // this function moves a Player component to the list they are not in
