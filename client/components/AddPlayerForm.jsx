@@ -3,6 +3,7 @@ const React = require('react');
 // var axios = require('axios');
 // const firebase = require("firebase/app");
 const db = require('../../firebaseinitialize.js');
+let playersRef;
 
 class Form extends React.Component {
 
