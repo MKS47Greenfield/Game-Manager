@@ -106,31 +106,10 @@ class Main extends React.Component {
           return false;
         }
         return true;
-<<<<<<< 2a9e964655d19560e986587e569c3434c90bddac
-      }.bind(this));
-      this.setState({
-        // Adds the players from the db not already in a tourney to allPlayersList
-        allPlayersList: currPlayers
-      });
-    });
-
-    db.ref(playersRef).on('child_added', function(snapshot) {
-      players.push(snapshot.val());
-      currPlayers = players.filter(function (player) {//filters for those in a tournament
-        if (self.state.tourneyPlayersList.includes(player)) {
-          return false;
-        }
-        return true;
       });
       console.log(currPlayers);
       if (currentPlayersList === 'allFifaPlayersList') {
 
-=======
-      });
-      console.log(currPlayers);
-      if (currentPlayersList === 'allFifaPlayersList') {
-
->>>>>>> players for current game rendering, with some errors
         self.setState({
           // Adds the players from the db not already in a tourney to allPlayersList
           allFifaPlayersList: currPlayers
@@ -200,7 +179,6 @@ class Main extends React.Component {
         console.log('error: ', err);
       }
     });
-
     this.createGames(newTourneyRef, this.state.tourneyPlayersList);
 
 
@@ -454,9 +432,20 @@ if (!this.state.pongView) {
     });
   }
 
+<<<<<<< be9f4280684c7f88c70ad84c7aa75d8d3acf5caf
   toggleBoth() {
+=======
+  togglePongView() {
+    console.log('figure out why pong state doesnt transfer to add player form as props');
+>>>>>>> tournaments and players adding properly, but pongstate not passing to addplayer component
     var self = this;
+    if (currentPlayersList === 'allFifaPlayersList') {
+      currentPlayersList = 'allPongPlayersList';
+    } else {
+      currentPlayersList = 'allFifaPlayersList';
+    }
     this.setState({
+<<<<<<< be9f4280684c7f88c70ad84c7aa75d8d3acf5caf
       statsView: !this.stat.statsView,
       pongView: !this.state.pongView
     })
@@ -471,6 +460,8 @@ if (!this.state.pongView) {
       currentPlayersList = 'allFifaPlayersList';
     }
     this.setState({
+=======
+>>>>>>> tournaments and players adding properly, but pongstate not passing to addplayer component
       pongView: !this.state.pongView,
       tourneyPlayersList: []
     });
