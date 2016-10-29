@@ -1,10 +1,10 @@
-var StatLine = require('./StatLine.jsx');
+var PongStatLine = require('./StatLine.jsx');
 var React = require('react');
 
-var StatsTable = (props) => {
+var PongStatsTable = (props) => {
 
   var statLines = props.table.map(function(user, i) {
-    return <StatLine playerStats={user} key={i} />;
+    return <PongStatLine playerStats={user} key={i} />;
   });
 
 
@@ -14,7 +14,7 @@ var StatsTable = (props) => {
       <table className="table">
         <thead>
           <tr>
-            <th onClick={function() {console.log('click')}}>Player</th>
+            <th>Player</th>
             <th>Games<br/>Played</th>
             <th>Wins</th>
             <th>Draws</th>
@@ -33,4 +33,4 @@ var StatsTable = (props) => {
   );
 };
 
-module.exports = StatsTable;
+module.exports = PongStatsTable;

@@ -1,6 +1,6 @@
 var React = require('react');
 
-var StatLine = (props) => {
+var PongStatLine = (props) => {
   var stats = props.playerStats;
   // going to need data object to hold other stats like we had before
   return (
@@ -17,6 +17,4 @@ var StatLine = (props) => {
   );
 };
 
-module.exports = StatLine;
-
-<PongStatsTable table={this.state.allPongPlayersList} />
+module.exports = PongStatLine;
