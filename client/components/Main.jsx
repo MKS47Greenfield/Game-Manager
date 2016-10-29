@@ -545,7 +545,8 @@ if (!this.state.pongView) {
       var currGame = self.state.currentGame;
       self.setState({
         currentTournamentGames: data.games,
-        currentGame: firstUnplayed
+        currentGame: firstUnplayed,
+        tourneyPlayersList: data.players
       });
       //here
       var standingsObj = data.games.filter(game =>
