@@ -390,22 +390,24 @@ if (!this.state.pongView) {
   togglePongStatsView() {
     var self = this;
     this.setState({
-      statsView: !this.state.pongStatsView,
+      pongStatsView: !this.state.pongStatsView,
       tourneyPlayersList: []
     });
-    // call our getAllPlayers
-    utils.getAllPlayers(this.state).then(res => {
-      self.setState({
-        allPlayersList: res
-      });
-    });
-    // and call our getOngoingTournaments
-    utils.getOngoingTournaments().then(function(tourneys) {
-      self.setState({
-        ongoingTournamentsList: tourneys
-      });
-    });
+    
   }
+  //   // call our getAllPlayers
+  //   utils.getAllPlayers(this.state).then(res => {
+  //     self.setState({
+  //       allPlayersList: res
+  //     });
+  //   });
+  //   // and call our getOngoingTournaments
+  //   utils.getOngoingTournaments().then(function(tourneys) {
+  //     self.setState({
+  //       ongoingTournamentsList: tourneys
+  //     });
+  //   });
+  
 
   toggleBoth() {
     var self = this;
