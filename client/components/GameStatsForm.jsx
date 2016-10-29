@@ -1,10 +1,9 @@
 var React = require('react');
-// var axios = require('axios');
-
+var firebase = require('firebase/app');
+var db = require('./../../firebaseinitialize.js')
 
 class GameStatsForm extends React.Component {
-
-  constructor(props) {
+  constructor(props){
     super(props);
 
 
@@ -12,7 +11,10 @@ class GameStatsForm extends React.Component {
       player_1_score: '',
       player_2_score: ''
     };
+
   }
+
+
 
   handleInputChangeHome(event) {
     this.setState({
@@ -29,13 +31,19 @@ class GameStatsForm extends React.Component {
   insertStats(event) {
 
     var self = this;
+    var playerRef;
     console.log('current game:', this.props.currentGame);
     var tourneyId = this.props.currentGame.tournament_id;
+    if(!self.state.pongView){
+      playerRef = db.ref('fifa/tournaments/' + tourneyId)
+    } else {
+      playerRef = db.ref('pong/tournaments/' + tourneyId)
+    }
     event.preventDefault();
-    axios.put('/api/games', {
+    playerRef.set({
       id: self.props.currentGame.id,
-      player1_score: this.state.player_1_score,
-      player2_score: this.state.player_2_score,
+      player1_score: self.state.player_1_score,
+      player2_score: self.state.player_2_score,
       status: 'disabled'
     })
     .then(function() {
@@ -45,9 +53,7 @@ class GameStatsForm extends React.Component {
         player_2_score: ''
       });
     })
-    .catch(function(err) {
-      res.status(500).send('Error Inserting Player Scores');
-    });
+
   }
             // <label htmlFor="player1_id">Home</label>
             // <label htmlFor="player2_id" >Away</label>
