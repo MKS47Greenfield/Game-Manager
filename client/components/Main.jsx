@@ -187,24 +187,27 @@ class Main extends React.Component {
   createGames(newTourneyRef, tourneyName, list) {
     var self = this;
     var playersList = list.slice();
+    var playersList2 = list.slice();
+
     var tourneyId = newTourneyRef.key;
     // This inner function is used to makeGames.
     function makeGames(tourneyId, list) {
       var games = [];
+      let gameCounter = 0;
+
 
       // while there is more than one player in the tourneyPlayersList,
       while (list.length > 1) {
 
         // shift the first item off and hold it with our nextPlayer variable,
         var nextPlayer = list.shift();
-
         // then forEach player left in there, create a game with the nextPlayer
         // and push that game into the games array.
         list.forEach(function(playerObj) {
 
           // This will be the object pushed into the games array.
           var gameObj = {};
-
+          gameCounter++;
           // set the needed values for the game object
           gameObj.player1_id = nextPlayer.uid;
           gameObj.player1_name = nextPlayer.username;
@@ -212,6 +215,7 @@ class Main extends React.Component {
           gameObj.player2_name = playerObj.username;
           gameObj.tournament_id = tourneyId;
           gameObj.tournament_name = tourneyName;
+          gameObj.id = gameCounter;
 
           // push into the games array
           games.push(gameObj);
@@ -221,14 +225,14 @@ class Main extends React.Component {
       return games;
     }
     // Call it!!
-    var games = makeGames(tourneyId, list);
+    var games = makeGames(tourneyId, playersList2);
     // return the promise from the query
     // return knex('games').insert(games);
     console.log('playersList:', playersList);
     console.log('tourneyId:', tourneyId);
 
     //FIREBASE
-    console.log(tourneysRef);
+    console.log('games:', games);
     db.ref(tourneysRef).child(tourneyId).set({
         'games': games,
         'players': playersList,
@@ -237,6 +241,10 @@ class Main extends React.Component {
 
     let gameCounter = 0;
     let gameId;
+
+    this.setState({
+      currentGame: games[0]
+    });
 
     return db.ref(gamesRef).push(games, function (error) {
       if (error) {
@@ -388,22 +396,49 @@ if (!this.state.pongView) {
     //   <Main pongView=(!this.props.pongView)/>, // JSX
     //   document.getElementById('app')
     // );
+    if(!this.state.pongView){
+      usersRef = 'users/';
+      playersRef = 'fifa/players/';
+      tourneysRef = 'fifa/tournaments/';
+      gamesRef = 'fifa/games/';
+      currentPlayersList = 'allFifaPlayersList';
+      currentTourneyList = 'ongoingFifaTournamentsList';
+    //
+    //   console.log(usersRef);
+    } else {
+      usersRef = 'users/';
+      playersRef = 'pong/players/';
+      tourneysRef = 'pong/tournaments/';
+      gamesRef = 'pong/games/';
+      currentPlayersList = 'allPongPlayersList';
+      currentTourneyList = 'ongoingPongTournamentsList';
+    }
   }
 
   togglePongView() {
     console.log('figure out why pong state doesnt transfer to add player form as props');
     var self = this;
-    if (currentPlayersList === 'allFifaPlayersList') {
-      currentPlayersList = 'allPongPlayersList';
-      currentTourneyList = 'ongoingFifaTournamentsList';
-    } else {
-      currentPlayersList = 'allFifaPlayersList';
-      currentTourneyList = 'ongoingPongTournamentsList';
-    }
     this.setState({
       pongView: !this.state.pongView,
       tourneyPlayersList: []
     });
+    if(!this.state.pongView){
+      usersRef = 'users/';
+      playersRef = 'fifa/players/';
+      tourneysRef = 'fifa/tournaments/';
+      gamesRef = 'fifa/games/';
+      currentPlayersList = 'allFifaPlayersList';
+      currentTourneyList = 'ongoingFifaTournamentsList';
+    //
+    //   console.log(usersRef);
+    } else {
+      usersRef = 'users/';
+      playersRef = 'pong/players/';
+      tourneysRef = 'pong/tournaments/';
+      gamesRef = 'pong/games/';
+      currentPlayersList = 'allPongPlayersList';
+      currentTourneyList = 'ongoingPongTournamentsList';
+    }
   }
 
 
@@ -461,12 +496,26 @@ if (!this.state.pongView) {
     var standingsArray = [];
 
     var self = this;
-    db.ref('tournaments/' + tourneyId).once('value').then(function(snapshot) {
+    db.ref(tourneysRef + tourneyId).once('value').then(function(snapshot) {
       var data = snapshot.val();
+      console.log('tournament data in update games:', data );
+      var organizedGames = data.games.reduce(function(prevGame, currGame) {
+        prevGame[currGame.status] ? prevGame[currGame.status].push(currGame) : prevGame[currGame.status] = [currGame];
+        return prevGame;
+      }, {});
+      var firstUnplayed;
+      if (!organizedGames.created) {
+        firstUnplayed = null;
+      } else {
+        firstUnplayed = organizedGames.active ? organizedGames.active[0] : organizedGames.created[0] || null;
+      }
+
+      // Then we take the first game from the active list (if we have one), otherwise we take the first game from the Created list
+
       var currGame = self.state.currentGame;
       self.setState({
         currentTournamentGames: data.games,
-        currentGame: data.nextGame
+        currentGame: firstUnplayed
       });
       //here
       var standingsObj = data.games.filter(game =>
@@ -513,10 +562,11 @@ if (!this.state.pongView) {
       // So we need to convert our array of player ids into a string with each
       // id separated by a '-' (dash).
       data.players.forEach(player => {
-          standingsObj[player.id].name = player.username;
-          standingsObj[player.id].playerId = player.id;
-          standingsArray.push(standingsObj[player.id]);
+          standingsObj[player.uid].name = player.username;
+          standingsObj[player.uid].playerId = player.uid;
+          standingsArray.push(standingsObj[player.uid]);
         });
+        console.log(standingsArray);
 
       });
       return standingsArray;
