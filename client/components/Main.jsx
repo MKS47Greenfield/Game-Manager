@@ -218,6 +218,7 @@ class Main extends React.Component {
           gameObj.tournament_id = tourneyId;
           gameObj.tournament_name = tourneyName;
           gameObj.id = gameCounter;
+          gameObj.status = 'created';
 
           // push into the games array
           games.push(gameObj);
@@ -251,7 +252,6 @@ class Main extends React.Component {
         currentTournament: currentTournament
       });
     });
-
     return db.ref(gamesRef).push(games, function (error) {
       if (error) {
         console.log("Data could not be saved, because: " + error);
@@ -259,6 +259,7 @@ class Main extends React.Component {
         console.log("Data saved successfully.");
       }
     });//returns the path to the new data (not a list of the objects)
+
 
 
     // return utils.postGames(newTourneyRef, list)
@@ -345,15 +346,20 @@ if (!this.state.pongView) {
       // Do nothing if the game you clicked on is already active.
       return;
     }
-
+    console.log('toBeActive.id:',toBeActive.id);
+    console.log('currentActive.id:',currentActive.id);
     // change the status key of each game to what we want.
     toBeActive.status = 'active';
     currentActive.status = 'created';
+    db.ref(tourneysRef + '/' + self.state.currentTournament.tourneyId + '/games/' + toBeActive.id + '/').set(toBeActive);
+    db.ref(tourneysRef + '/' + self.state.currentTournament.tourneyId + '/games/' + currentActive.id + '/').set(currentActive);
+    db.ref(gamesRef + '/' + self.state.currentTournament.tourneyId + '/games/' + toBeActive.id + '/').set(toBeActive);
+    db.ref(gamesRef + '/' + self.state.currentTournament.tourneyId + '/games/' + currentActive.id + '/').set(currentActive);
 
     // utils.updateGameStatus(toBeActive, currentActive).then(res => {
       // Then we update the games with the current tournament id
       console.log(self.state.currentTournament);
-      self.updateGames(self.state.currentTournament.id);
+      self.updateGames(self.state.currentTournament.tourneyId);
     // });
   }
 
@@ -518,7 +524,7 @@ if (!this.state.pongView) {
 //GameStatsForm calls this function after it has PUT the entered stats in the database.
   updateGames(tourneyId, callback) {
     var standingsArray = [];
-
+    console.log('tourneyId in update games:',tourneyId);
     var self = this;
     db.ref(tourneysRef + tourneyId).once('value').then(function(snapshot) {
       var data = snapshot.val();
@@ -536,13 +542,13 @@ if (!this.state.pongView) {
 
       // Then we take the first game from the active list (if we have one), otherwise we take the first game from the Created list
 
-      var currGame = self.state.currentGame;
       self.setState({
         currentTournamentGames: data.games,
         currentGame: firstUnplayed,
         tourneyPlayersList: data.players,
         currentTournamentTable: data.players
       });
+      var currGame = self.state.currentGame;
       //here
       var standingsObj = data.games.filter(game =>
         game.player1_score !== null
@@ -644,20 +650,20 @@ if (!this.state.pongView) {
       }
       dictionary[game.player2_id] = 'found';
 
-    });
+    });//TODO NOTE finish
 
-    var idsString = uniquePlayerIds.join('-');
+    // var idsString = uniquePlayerIds.join('-');
 
-    axios.get('./api/player', {
-      params: {
-        tournament_players: idsString
-      }
-    })
-    .then(function(playersInCurrentTourney) {
-      context.setState({
-        tourneyPlayersList: playersInCurrentTourney.data,
-      });
-    });
+    // axios.get('./api/player', {
+    //   params: {
+    //     tournament_players: idsString
+    //   }
+    // })
+    // .then(function(playersInCurrentTourney) {
+      // context.setState({
+      //   tourneyPlayersList: playersInCurrentTourney.data,
+      // });
+    // });
   }
 
 

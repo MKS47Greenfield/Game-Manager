@@ -35,24 +35,24 @@ class GameStatsForm extends React.Component {
     console.log('current game:', this.props.currentGame);
     var tourneyId = this.props.currentGame.tournament_id;
     if(!self.state.pongView){
-      playerRef = db.ref('fifa/tournaments/' + tourneyId)
+      playerRef = db.ref('fifa/tournaments/' + tourneyId + '/games/' + self.props.currentGame.id)
     } else {
-      playerRef = db.ref('pong/tournaments/' + tourneyId)
+      playerRef = db.ref('pong/tournaments/' + tourneyId + '/games/' + self.props.currentGame.id)
     }
     event.preventDefault();
-    playerRef.set({
-      id: self.props.currentGame.id,
-      player1_score: self.state.player_1_score,
-      player2_score: self.state.player_2_score,
-      status: 'disabled'
-    })
+    var updatedGame = self.props.currentGame;
+    updatedGame.player1_score = self.state.player_1_score;
+    updatedGame.player2_score = self.state.player_2_score;
+    updatedGame.status = 'disabled';
+
+    playerRef.set(updatedGame)
     .then(function() {
       self.props.updateGames(tourneyId);
       self.setState({
         player_1_score: '',
         player_2_score: ''
       });
-    })
+    });
 
   }
             // <label htmlFor="player1_id">Home</label>
