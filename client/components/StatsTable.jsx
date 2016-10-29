@@ -2,7 +2,7 @@ var StatLine = require('./StatLine.jsx');
 var React = require('react');
 
 var StatsTable = (props) => {
-
+  console.log('props.table:',props.table);
   var statLines = props.table.map(function(user, i) {
     return <StatLine playerStats={user} key={i} />;
   });
