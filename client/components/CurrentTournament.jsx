@@ -8,7 +8,7 @@ var CurrentTournament = (props) => {
 
   props.tourney.tourneyPlayersList.forEach(function(player) {
 
-    playersInTourney[player.id] = player.username;
+    playersInTourney[player.uid] = player.username;
   });
 
   // Use that object and props to map over the list of games and return a built out Game Component

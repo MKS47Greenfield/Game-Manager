@@ -1,5 +1,5 @@
 var React = require('react');
-var axios = require('axios');
+// var axios = require('axios');
 
 
 class GameStatsForm extends React.Component {
@@ -27,7 +27,9 @@ class GameStatsForm extends React.Component {
   }
 
   insertStats(event) {
+
     var self = this;
+    console.log('current game:', this.props.currentGame);
     var tourneyId = this.props.currentGame.tournament_id;
     event.preventDefault();
     axios.put('/api/games', {
