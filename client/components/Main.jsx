@@ -393,21 +393,7 @@ if (!this.state.pongView) {
       pongStatsView: !this.state.pongStatsView,
       tourneyPlayersList: []
     });
-    
   }
-  //   // call our getAllPlayers
-  //   utils.getAllPlayers(this.state).then(res => {
-  //     self.setState({
-  //       allPlayersList: res
-  //     });
-  //   });
-  //   // and call our getOngoingTournaments
-  //   utils.getOngoingTournaments().then(function(tourneys) {
-  //     self.setState({
-  //       ongoingTournamentsList: tourneys
-  //     });
-  //   });
-  
 
   toggleBoth() {
     var self = this;
@@ -707,7 +693,7 @@ if (!this.state.pongView) {
             </div>
 
             <div className="col-xs-10">
-              <StatsTable table={this.state.allFifaPlayersList} />
+              <PongStatsTable table={this.state.allPongPlayersList} />
             </div>
 
             <div className="col-xs-1">
