@@ -74,23 +74,15 @@ class Main extends React.Component {
     //https://firebase.googleblog.com/2014/05/using-firebase-with-reactjs.html
     console.log(this.state.pongView);
     const self = this;
-    if(!this.state.pongView){
-      usersRef = 'users/';
-      playersRef = 'fifa/players/';
-      tourneysRef = 'fifa/tournaments/';
-      gamesRef = 'fifa/games/';
-      currentPlayersList = 'allFifaPlayersList';
-      currentTourneyList = 'ongoingFifaTournamentsList';
+    usersRef = 'users/';
+    playersRef = 'fifa/players/';
+    tourneysRef = 'fifa/tournaments/';
+    gamesRef = 'fifa/games/';
+    currentPlayersList = 'allFifaPlayersList';
+    currentTourneyList = 'ongoingFifaTournamentsList';
     //
     //   console.log(usersRef);
-    } else {
-      usersRef = 'users/';
-      playersRef = 'pong/players/';
-      tourneysRef = 'pong/tournaments/';
-      gamesRef = 'pong/games/';
-      currentPlayersList = 'allPongPlayersList';
-      currentTourneyList = 'ongoingPongTournamentsList';
-    }
+
     db.ref('users/').on('child_added', function(snapshot) {
       self.state.allPlayersList.push(snapshot.val());
       self.state.allFifaPlayersList.push(snapshot.val());
@@ -209,7 +201,6 @@ class Main extends React.Component {
 
           // This will be the object pushed into the games array.
           var gameObj = {};
-          gameCounter++;
           // set the needed values for the game object
           gameObj.player1_id = nextPlayer.uid;
           gameObj.player1_name = nextPlayer.username;
@@ -220,6 +211,7 @@ class Main extends React.Component {
           gameObj.id = gameCounter;
           gameObj.status = 'created';
 
+          gameCounter++;
           // push into the games array
           games.push(gameObj);
         });
@@ -247,7 +239,7 @@ class Main extends React.Component {
     });
     db.ref(tourneysRef).child(tourneyId).once('value').then(function(snapshot) {
       var currentTournament = snapshot.val();
-      this.setState({
+      self.setState({
         currentGame: games[0],
         currentTournament: currentTournament
       });
@@ -407,7 +399,7 @@ if (!this.state.pongView) {
 
   toggleBoth() {
     var self = this;
-    
+
     if(this.state.pongStatsView) {
       this.setState({
         pongStatsView: !this.state.pongStatsView,
@@ -475,50 +467,57 @@ if (!this.state.pongView) {
   finishTournament() {
     // set our self here.
     var self = this;
+    var tournament = this.state.currentTournament;
 
+    var allPlayas = self.state[currentPlayersList].concat(self.state.tourneyPlayersList);
+    var uniquePlayas = utils.filterToUniquePlayers(allPlayas);
+    var tourneysSlice = this.state.ongoingTournamentsList.slice();
+    for(var i = tourneysSlice - 1; i > -1; i--){
+      if(tourneysSlice[i] === tournament){
+        tourneysSlice.splice(i,1);
+      }
+    }
     // the sorting for the tournament table should happen on game submits,
       // so that means the first item in the currentTournamentTable array
       // should be the winner of our tournament when we end it!
     var winner = this.state.currentTournamentTable.shift();
 
     // grab the tournament we are in from the state,
-    var tournament = this.state.currentTournament;
     // set the winner for the tournament based on the winner's id
-    tournament.winner_id = winner.playerId;
+    tournament.winner_id = winner.username;
+
+    db.ref(tourneysRef + '/' + tournament.tourneyId).set(tournament);
+    alert('Congratulations to ' + winner.username + ' for winning the ' + tournament.tourneyName + ' tournament!');
 
     // That results object will be passed into the put request to the server.
-    axios.put('/api/tournaments', tournament)
-      .then(function(response) {
-        // This (untested) alert definitely doesnt work right now, but is a place holder for some sort of
-          // Congradulations to the winner.
-        alert('Congratulations to ' + winner.name + ' for winning the ' + tournament.tournament_name + ' tournament!');
+    // axios.put('/api/tournaments', tournament)
+    //   .then(function(response) {
+    //     // This (untested) alert definitely doesnt work right now, but is a place holder for some sort of
+    //       // Congradulations to the winner.
 
 
-        var allPlayas = self.state.allPlayersList.concat(self.state.tourneyPlayersList);
 
 
-        var uniquePlayas = utils.filterToUniquePlayers(allPlayas);
         // Then we set our currentTournament back to null to go back to the create tournament page.
-        self.setState({
-          currentTournament: null,
-          allPlayersList: uniquePlayas,
-          tourneyPlayersList: []
-        });
-
-      })
-      .then(res => {
-        utils.getOngoingTournaments()
-          .then(function(tourneys) {
-            self.setState({
-              ongoingTournamentsList: tourneys,
-              currentTournamentTable: []
-            });
-          });
-      })
-      .catch(function(err) {
-        // A catch in the event the put request fails.
-        console.log('FinishTournament Error:', err);
+      self.setState({
+        currentTournament: null,
+        allPlayersList: uniquePlayas,
+        tourneyPlayersList: [],
+        ongoingTournamentsList: tourneysSlice,
+        currentTournamentTable: []
       });
+
+      // })
+      // .then(res => {
+        // utils.getOngoingTournaments()
+        //   .then(function(tourneys) {
+
+          // });
+      // })
+      // .catch(function(err) {
+      //   // A catch in the event the put request fails.
+      //   console.log('FinishTournament Error:', err);
+      // });
   }
 
 //GameStatsForm calls this function after it has PUT the entered stats in the database.
@@ -593,11 +592,26 @@ if (!this.state.pongView) {
     // getAllPlayers function was made to accept a query string from a put request.
       // So we need to convert our array of player ids into a string with each
       // id separated by a '-' (dash).
+      var playersWithStats = this.state[currentPlayersList];
       data.players.forEach(player => {
           standingsObj[player.uid].name = player.username;
           standingsObj[player.uid].playerId = player.uid;
           standingsArray.push(standingsObj[player.uid]);
+          var index = playersWithStats.indexOf(player);
+          if(index !== -1){
+            playersWithStats[index].playerStats = standingsObj[player.uid];
+          }
         });
+        if (currentPlayersList === 'allFifaPlayersList') {
+          this.setState({
+            allFifaPlayersList: playersWithStats
+          });
+        } else {
+          this.setState({
+            allPongPlayersList: playersWithStats
+          });
+        }
+
         console.log(standingsArray);
 
       });
