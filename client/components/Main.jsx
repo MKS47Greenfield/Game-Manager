@@ -64,6 +64,8 @@ class Main extends React.Component {
 
       pongView: false,
 
+      pongStatsView: false,
+
       statLines: []
     };
   }
@@ -385,12 +387,39 @@ if (!this.state.pongView) {
     });
   }
 
-  toggleBoth() {
+  togglePongStatsView() {
     var self = this;
     this.setState({
-      pongView: !this.state.pongView,
-      statsView: !this.state.statsView
+      statsView: !this.state.pongStatsView,
+      tourneyPlayersList: []
     });
+    // call our getAllPlayers
+    utils.getAllPlayers(this.state).then(res => {
+      self.setState({
+        allPlayersList: res
+      });
+    });
+    // and call our getOngoingTournaments
+    utils.getOngoingTournaments().then(function(tourneys) {
+      self.setState({
+        ongoingTournamentsList: tourneys
+      });
+    });
+  }
+
+  toggleBoth() {
+    var self = this;
+    if(this.state.pongStatsView) {
+      this.setState({
+        pongStatsView: !this.state.pongStatsView,
+        pongView: !this.state.pongView
+      })
+    }else{
+      this.setState({
+        pongView: !this.state.pongView,
+        statsView: !this.state.statsView
+      });
+    }
     // React.unmountComponentAtNode(document.getElementById('app'));
     // React.renderComponent(
     //   <Main pongView=(!this.props.pongView)/>, // JSX
@@ -414,6 +443,7 @@ if (!this.state.pongView) {
       currentTourneyList = 'ongoingPongTournamentsList';
     }
   }
+
 
   togglePongView() {
     console.log('figure out why pong state doesnt transfer to add player form as props');
@@ -636,8 +666,73 @@ if (!this.state.pongView) {
 
 
   render() {
+    // if the pong stats view is enabled 
+      if(this.state.pongStatsView){
+        return (
+        <div className="pong">
+          <nav className="navbar navbar-inverse">
+            <div className="navbar-header">
+              <a className="navbar-brand" href="#">PING PONG TOURNAMENT MANAGER</a>
+            </div>
+            <ul className="nav navbar-nav">
+              <li><a href="#"><span onClick={this.togglePongStatsView.bind(this)} >Home</span></a></li>
+              <li><a href="#"><span>Stats</span></a></li>
+            </ul>
+          </nav>
+          <div className="container">
+            <div className="jumbotron header">
+              <h1>VIEW YOUR STATS!</h1>
+              <p>
+                Check out the lifetime stats of all your added players!
+              </p>
+            </div>
+
+          </div>
+
+          <div className="row">
+            <div className="col-xs-12">
+                <h3>.</h3>
+                <h3>.</h3>
+            </div>
+          </div>
+
+
+          <div className="row">
+
+            <div className="col-xs-1">
+
+            </div>
+
+            <div className="col-xs-10">
+              <StatsTable table={this.state.allFifaPlayersList} />
+            </div>
+
+            <div className="col-xs-1">
+
+            </div>
+          </div>
+          <div className="well"></div>
+          <div className="row">
+            <div className="col-xs-2"></div>
+            <div className="col-xs-8">
+              <div className="panel panel-default">
+                <div className="panel-body">
+                  <h1 className="fin">
+                    <ul className="nav navbar-foot">
+                      <li><a href="#"><span onClick={this.toggleBoth.bind(this)}>FIFA</span></a></li>
+                      <li><a href="#"><span>PING PONG</span></a></li>
+                    </ul>
+                  </h1>
+                </div>
+              </div>
+            </div>
+            <div className="col-xs-2"></div>
+          </div>
+        </div>
+      )
+    }
     // if the pong view is enabled
-    if(this.state.pongView) {
+    else if(this.state.pongView) {
       return (
         <div className="pong">
           <nav className="navbar navbar-inverse">
@@ -646,7 +741,7 @@ if (!this.state.pongView) {
             </div>
             <ul className="nav navbar-nav">
               <li><a href="#"><span>Home</span></a></li>
-              <li><a href="#"><span onClick={this.toggleStatsView.bind(this)}>Stats</span></a></li>
+              <li><a href="#"><span onClick={this.togglePongStatsView.bind(this)}>Stats</span></a></li>
             </ul>
             <div className='loginBar'>
               <Login />
@@ -723,7 +818,7 @@ if (!this.state.pongView) {
         )
     }
 
-    if(this.state.statsView) {
+    else if(this.state.statsView) {
       return (
         <div className="background">
           <nav className="navbar navbar-inverse">
