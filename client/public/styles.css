@@ -214,4 +214,6 @@ li a:hover {
 .loginBar {
   float:right;
   text-align: right;
+  border-right: solid 5px #FAD817;
+  margin-right: 10px;
 }
