@@ -235,17 +235,21 @@ class Main extends React.Component {
 
     //FIREBASE
     console.log('games:', games);
-    db.ref(tourneysRef).child(tourneyId).set({
-        'games': games,
-        'players': playersList,
-        'tourneyName': tourneyName
-    });
 
     let gameCounter = 0;
     let gameId;
-
-    this.setState({
-      currentGame: games[0]
+    db.ref(tourneysRef).child(tourneyId).set({
+        'games': games,
+        'players': playersList,
+        'tourneyName': tourneyName,
+        'currentGame': games[0]
+    });
+    db.ref(tourneysRef).child(tourneyId).once('value').then(function(snapshot) {
+      var currentTournament = snapshot.val();
+      this.setState({
+        currentGame: games[0],
+        currentTournament: currentTournament
+      });
     });
 
     return db.ref(gamesRef).push(games, function (error) {
@@ -534,7 +538,8 @@ if (!this.state.pongView) {
       self.setState({
         currentTournamentGames: data.games,
         currentGame: firstUnplayed,
-        tourneyPlayersList: data.players
+        tourneyPlayersList: data.players,
+        currentTournamentTable: data.players
       });
       //here
       var standingsObj = data.games.filter(game =>
@@ -655,7 +660,7 @@ if (!this.state.pongView) {
 
 
   render() {
-    // if the pong stats view is enabled 
+    // if the pong stats view is enabled
       if(this.state.pongStatsView){
         return (
         <div className="pong">
