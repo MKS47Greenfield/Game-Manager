@@ -72,19 +72,19 @@ class Main extends React.Component {
     console.log(this.state.pongView);
     const self = this;
     if(!this.state.pongView){
-    //   usersRef = 'users/';
-    //   playersRef = 'fifa/players/';
-    //   tourneysRef = 'fifa/tournaments/';
-    //   gamesRef = 'fifa/games/';
+      usersRef = 'users/';
+      playersRef = 'fifa/players/';
+      tourneysRef = 'fifa/tournaments/';
+      gamesRef = 'fifa/games/';
       currentPlayersList = 'allFifaPlayersList';
       currentTourneyList = 'ongoingFifaTournamentsList';
     //
     //   console.log(usersRef);
     } else {
-    //   usersRef = 'users/';
-    //   playersRef = 'pong/players/';
-    //   tourneysRef = 'pong/tournaments/';
-    //   gamesRef = 'pong/games/';
+      usersRef = 'users/';
+      playersRef = 'pong/players/';
+      tourneysRef = 'pong/tournaments/';
+      gamesRef = 'pong/games/';
       currentPlayersList = 'allPongPlayersList';
       currentTourneyList = 'ongoingPongTournamentsList';
     }
@@ -108,7 +108,7 @@ class Main extends React.Component {
 
     var ongoingFifaTournamentsList = [];
     var ongoingPongTournamentsList = [];
-    db.ref('fifa/tournaments/').on('child_added', function(snapshot) {
+    db.ref(tourneysRef).on('child_added', function(snapshot) {
       ongoingFifaTournamentsList.push({
         tourneyId: snapshot.key,
         data: snapshot.val()
@@ -157,7 +157,7 @@ class Main extends React.Component {
   //createTournament will make a post request to the server, which will insert the
     // new tournament into the DB, and after that call the createGames function
   createTournament(tourneyName) {
-    var context = this;
+    var self = this;
     // post request to the /api/tournaments endpoint with the tourneyName included
     if (this.state.tourneyPlayersList.length < 2) {
       console.log('not enough players in tournament');
@@ -167,14 +167,14 @@ class Main extends React.Component {
     console.log('MAIN cT tourneyName: ', tourneyName);
     var newTourneyRef = db.ref(tourneysRef).push();
 
-    newTourneyRef.set({
-      tourneyName: tourneyName,
-    }, function(err) {
-      if (err) {
-        console.log('error: ', err);
-      }
-    });
-    context.setState({
+    // newTourneyRef.set({
+    //   'tourneyName': tourneyName,
+    // }, function(err) {
+    //   if (err) {
+    //     console.log('error: ', err);
+    //   }
+    // });
+    self.setState({
       // currentTournamentTable: res,
       currentTournament: { id: newTourneyRef.key, data:{ tourneyName: tourneyName } }
     });
@@ -186,7 +186,6 @@ class Main extends React.Component {
   createGames(newTourneyRef, tourneyName, list) {
     var self = this;
     var playersList = list.slice();
-
     var tourneyId = newTourneyRef.key;
     // This inner function is used to makeGames.
     function makeGames(tourneyId, list) {
@@ -206,9 +205,9 @@ class Main extends React.Component {
           var gameObj = {};
 
           // set the needed values for the game object
-          gameObj.player1_id = nextPlayer.id;
+          gameObj.player1_id = nextPlayer.uid;
           gameObj.player1_name = nextPlayer.username;
-          gameObj.player2_id = playerObj.id;
+          gameObj.player2_id = playerObj.uid;
           gameObj.player2_name = playerObj.username;
           gameObj.tournament_id = tourneyId;
           gameObj.tournament_name = tourneyName;
@@ -225,12 +224,13 @@ class Main extends React.Component {
     // return the promise from the query
     // return knex('games').insert(games);
     console.log('playersList:', playersList);
+    console.log('tourneyId:', tourneyId);
 
     //FIREBASE
-    console.log(games);
+    console.log(tourneysRef);
     db.ref(tourneysRef).child(tourneyId).set({
         'games': games,
-        'players': players,
+        'players': playersList,
         'tourneyName': tourneyName
     });
 
@@ -335,12 +335,11 @@ if (!this.state.pongView) {
     toBeActive.status = 'active';
     currentActive.status = 'created';
 
-    // updateGameStatus takes the two games to be updated and returns a promise object
-      // that we do nothing with :P, but we need to wait for that to finish before updating the games.
-    utils.updateGameStatus(toBeActive, currentActive).then(res => {
+    // utils.updateGameStatus(toBeActive, currentActive).then(res => {
       // Then we update the games with the current tournament id
+      console.log(self.state.currentTournament);
       self.updateGames(self.state.currentTournament.id);
-    });
+    // });
   }
 
   setCurrentTournament(index, tourneyId) {
@@ -408,7 +407,7 @@ if (!this.state.pongView) {
 
 
   finishTournament() {
-    // set our context here.
+    // set our self here.
     var self = this;
 
     // the sorting for the tournament table should happen on game submits,
@@ -458,27 +457,95 @@ if (!this.state.pongView) {
 
 //GameStatsForm calls this function after it has PUT the entered stats in the database.
   updateGames(tourneyId, callback) {
+    var standingsArray = [];
 
     var self = this;
-    utils.getGamesByTourneyId(tourneyId).then(res => {
+    db.ref('tournaments/' + tourneyId).once('value').then(function(snapshot) {
+      var data = snapshot.val();
+      var currGame = self.state.currentGame;
       self.setState({
-        currentTournamentGames: res.games,
-        currentGame: res.nextGame
+        currentTournamentGames: data.games,
+        currentGame: data.nextGame
       });
-    }).then(res =>{
-      utils.getTableForTourney(tourneyId)
-        .then(res => {
-          self.setState({
-            currentTournamentTable: res
-          });
-        })
-        .catch(err => {
-          throw err;
+      //here
+      var standingsObj = data.games.filter(game =>
+        game.player1_score !== null
+      ).reduce(function(standings, currGame) {
+        // collect the player ids for this game
+        var p1 = currGame.player1_id;
+        var p2 = currGame.player2_id;
+
+        // If player 1 and player 2 already have keys on the standings object, increment their games played.
+          // Otherwise create the new stats object and count the first game.
+        standings[p1] ? standings[p1].gp++ : standings[p1] = {gp: 1, win: 0, loss: 0, draw: 0, gd: 0, points: 0};
+        standings[p2] ? standings[p2].gp++ : standings[p2] = {gp: 1, win: 0, loss: 0, draw: 0, gd: 0, points: 0};
+
+        // Collect the scores for each player for this game.
+        var p1Score = currGame.player1_score;
+        var p2Score = currGame.player2_score;
+
+        // Using Math.abs gives us a positive number always, we add this to the winner's Goal Differential,
+          // and subtract it from the loser's GD
+        var goalDiff = Math.abs(p1Score - p2Score);
+
+        // This monstrosity of a nested ternary operation handles the accumulation of points and wins/losses/draws
+          // First it checks if the game was a draw, if it was we have all the info we need to finish setting everything.
+        p1Score === p2Score ? (
+          standings[p1].draw++, standings[p2].draw++, standings[p1].points += 1, standings[p2].points += 1
+          // If the game wasn't a draw, we go about finding a winner and setting the data we need.
+        ) : p1Score > p2Score ? (
+          standings[p1].win++, standings[p2].loss++, standings[p1].points += 3, standings[p1].gd += goalDiff, standings[p2].gd -= goalDiff
+        ) : (
+          standings[p2].win++, standings[p1].loss++, standings[p2].points += 3, standings[p1].gd -= goalDiff, standings[p2].gd += goalDiff
+        );
+
+        return standings;
+      }, {});
+
+      // var idString = '';
+      //
+      // for (key in standingsObj) {
+      //   idString += ('-' + key);
+      // }
+
+    // getAllPlayers function was made to accept a query string from a put request.
+      // So we need to convert our array of player ids into a string with each
+      // id separated by a '-' (dash).
+      data.players.forEach(player => {
+          standingsObj[player.id].name = player.username;
+          standingsObj[player.id].playerId = player.id;
+          standingsArray.push(standingsObj[player.id]);
         });
-    }).then(res => {
-      typeof callback === 'function' ? callback(tourneyId, self) : '';
-    });
+
+      });
+      return standingsArray;
+
   }
+
+    // });
+  //   var table = res.data.sort(function(prevPlayer, currentPlayer) {
+  //     return prevPlayer.points === currentPlayer.points ? currentPlayer.gd - prevPlayer.gd : currentPlayer.points - prevPlayer.points;
+  //   });
+  //
+  //   utils.getGamesByTourneyId(tourneyId).then(res => {
+  //     self.setState({
+  //       currentTournamentGames: res.games,
+  //       currentGame: res.nextGame
+  //     });
+  //   }).then(res =>{
+  //     utils.getTableForTourney(tourneyId)
+  //       .then(res => {
+  //         self.setState({
+  //           currentTournamentTable: res
+  //         });
+  //       })
+  //       .catch(err => {
+  //         throw err;
+  //       });
+  //   }).then(res => {
+  //     typeof callback === 'function' ? callback(tourneyId, self) : '';
+  //   });
+  // }
 
   updatePlayers(tourneyId, context) {
     // After setting the games, we will also want to reset the players so that they are displayed correctly when we set a new currentTournament
