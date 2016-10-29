@@ -450,7 +450,7 @@ if (!this.state.pongView) {
       playersRef = 'fifa/players/';
       tourneysRef = 'fifa/tournaments/';
       gamesRef = 'fifa/games/';
-      currentPlayersList = 'allFifaPlayersList';
+      currentPlayersList = 'allPongPlayersList';
       currentTourneyList = 'ongoingFifaTournamentsList';
     //
     //   console.log(usersRef);
@@ -459,9 +459,10 @@ if (!this.state.pongView) {
       playersRef = 'pong/players/';
       tourneysRef = 'pong/tournaments/';
       gamesRef = 'pong/games/';
-      currentPlayersList = 'allPongPlayersList';
+      currentPlayersList = 'allFifaPlayersList';
       currentTourneyList = 'ongoingPongTournamentsList';
     }
+    console.log('current players list',currentPlayersList)
   }
 
 
