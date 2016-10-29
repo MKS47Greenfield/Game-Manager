@@ -25,6 +25,7 @@ const CurrentTournament = require('./CurrentTournament.jsx');
 const FinishTournament = require('./FinishTournament.jsx');
 const OngoingTournamentsList = require('./OngoingTournamentsList.jsx');
 const StatsTable = require('./StatsTable.jsx');
+const PongStatsTable = require('./PongStatsTable');
 const utils = require('../fireUtils.js');
 const Login = require('./Login.jsx');
 
